@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Streapost
+Streapost is a simple posts list explorer built with **Next.js**, **Prisma**, and **SQLite**.
 
-## Getting Started
+The application lists posts and allows filtering them by the author (`userId`). It also supports deleting posts and includes error handling for network failures.
 
-First, run the development server:
+The project was built as part of a technical challenge.
+
+---
+
+# Tech Stack
+
+- Next.js
+- TypeScript
+- Prisma ORM
+- SQLite
+- Tailwind CSS
+
+---
+
+# Getting Started
+
+## 1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 2. Configure environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a .env file in the project root with the following:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+DATABASE_URL="file:./dev.db"
 
-## Learn More
+For simplicity in this challenge, the .env file is committed to the repository.
 
-To learn more about Next.js, take a look at the following resources:
+## 3. Run database migrations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx prisma migrate dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This will create the SQLite database (dev.db) and apply the schema.
 
-## Deploy on Vercel
+## 4. Seed the database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx prisma db seed
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The seed script fetches data from:
+
+https://jsonplaceholder.typicode.com/users
+
+https://jsonplaceholder.typicode.com/posts
+
+and inserts it into the local SQLite database.
+
+## 5. Run the development server
+```bash
+npm run dev
+```
+
+Open:
+
+http://localhost:3000
+
+# Project Structure
+src/
+  app/
+  components/
+prisma/
+  schema.prisma
+  seed.ts
+
+# Features
+- List posts
+- Filter posts by userId
+- Delete posts with confirmation modal
+- Error handling for API failures
+
+# Database
+
+The application uses SQLite for simplicity.
+
+## Tables
+User
+- id
+- name
+- username
+- email
+- phone
+- website
+
+Post
+- id
+- userId
+- title
+- body
+
+## Relationship
+User (1) → (N) Post
