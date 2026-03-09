@@ -65,59 +65,6 @@ Open:
 
 http://localhost:3000
 
-# Project Structure
-streapost/
-├── app/
-│   ├── api/
-│   │   ├── posts/
-│   │   │   ├── route.ts           # GET /api/posts (paginated, filterable by author)
-│   │   │   └── [id]/
-│   │   │       └── route.ts       # GET, DELETE /api/posts/[id]
-│   │   └── users/
-│   │       ├── route.ts           # GET /api/users (paginated, searchable)
-│   │       └── [id]/
-│   │           └── route.ts       # GET /api/users/[id]
-│   ├── components/
-│   │   ├── common/                # Shared across domains
-│   │   │   ├── DeleteModal.tsx
-│   │   │   ├── EmptyState.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── LoadingOverlay.tsx
-│   │   │   ├── OfflineBanner.tsx
-│   │   │   ├── SWRProvider.tsx
-│   │   │   └── ThemeProvider.tsx
-│   │   ├── posts/
-│   │   │   ├── PostCard.tsx
-│   │   │   ├── PostCardMenu.tsx
-│   │   │   ├── PostsFilter.tsx
-│   │   │   ├── PostsGrid.tsx
-│   │   │   └── PostsList.tsx
-│   │   └── writers/
-│   │       └── WritersSidebar.tsx
-│   ├── hooks/
-│   │   ├── useLanguage.ts         # Global i18n via useSyncExternalStore
-│   │   ├── useOnlineStatus.ts     # navigator.onLine + browser events
-│   │   ├── usePosts.ts            # SWR infinite + debounce + optimistic delete
-│   │   ├── useTheme.ts            # Dark/light mode
-│   │   └── useWriters.ts          # SWR infinite + debounced search
-│   ├── posts/[id]/page.tsx
-│   ├── types/
-│   │   ├── index.ts               # Re-exports
-│   │   ├── post.ts                # Post, PostsResponse
-│   │   └── user.ts                # User, Writer, WritersResponse
-│   └── writers/
-│       ├── [id]/page.tsx
-│       └── page.tsx
-├── lib/
-│   ├── messages.ts                # i18n strings (en, es)
-│   ├── prisma.ts                  # Prisma client singleton
-│   └── services/
-│       ├── post.service.ts        # getPosts, getPostById, deletePost
-│       └── user.service.ts        # getUsers, getUserById
-└── prisma/
-    ├── schema.prisma
-    └── seed.ts
-
 ## Architecture
 ### Component organization
 Components are grouped by domain under app/components/
