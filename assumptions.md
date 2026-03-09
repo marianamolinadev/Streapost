@@ -1,4 +1,11 @@
 # Assumptions
 - Only the fields necessary for the challenge were persisted in the database.
-- Address and company information from the source API were not stored.
+- Address and specific company information from the source API were not stored.
 - The seed script is idempotent and can be run multiple times without creating duplicate records.
+- No authentication or authorization is implemented — any user can delete any post.
+- Cursor-based pagination assumes records are ordered by `id ASC` and are never reordered.
+- Page size is fixed: 50 posts per page, 20 writers per page.
+- Author filter matches against name, username, email, and user ID.
+- Language preference is stored in `localStorage` and defaults to the browser language, falling back to English.
+- The app does not sync with the source API after the initial seed. The local database is the single source of truth.
+- The app is designed for potentially unstable connections. Data is cached client-side and revalidated automatically on reconnect.

@@ -14,6 +14,8 @@ model User {
   email    String
   phone    String?
   website  String?
+  company  String?
+  city     String?
   posts    Post[]
 }
 

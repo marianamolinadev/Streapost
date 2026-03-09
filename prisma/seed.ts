@@ -5,16 +5,16 @@ const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL!,
 })
 
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Fetching users and posts...")
+  console.log("Fetching users and posts...");
 
-  const usersRes = await fetch("https://jsonplaceholder.typicode.com/users")
+  const usersRes = await fetch("https://jsonplaceholder.typicode.com/users");
   if (!usersRes.ok) {
-    throw new Error(`Failed to fetch users: ${usersRes.status}`)
+    throw new Error(`Failed to fetch users: ${usersRes.status}`);
   }
-  const users = await usersRes.json()
+  const users = await usersRes.json();
 
   for (const user of users) {
     await prisma.user.upsert({
@@ -25,6 +25,8 @@ async function main() {
         email: user.email,
         phone: user.phone ?? null,
         website: user.website ?? null,
+        company: user.company?.name ?? null,
+        city: user.address?.city ?? null,
       },
       create: {
         id: user.id,
@@ -33,15 +35,17 @@ async function main() {
         email: user.email,
         phone: user.phone ?? null,
         website: user.website ?? null,
+        company: user.company?.name ?? null,
+        city: user.address?.city ?? null,
       },
     })
   }
 
   const postsRes = await fetch("https://jsonplaceholder.typicode.com/posts")
   if (!postsRes.ok) {
-    throw new Error(`Failed to fetch posts: ${postsRes.status}`)
+    throw new Error(`Failed to fetch posts: ${postsRes.status}`);
   }
-  const posts = await postsRes.json()
+  const posts = await postsRes.json();
 
   for (const post of posts) {
     await prisma.post.upsert({
@@ -60,14 +64,14 @@ async function main() {
     })
   }
 
-  console.log("Seed completed")
+  console.log("Seed completed");
 }
 
 main()
   .catch((e) => {
     console.error(e);
-    process.exit(1)
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })

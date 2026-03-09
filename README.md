@@ -8,12 +8,13 @@ The project was built as part of a technical challenge.
 ---
 
 # Tech Stack
-
 - Next.js
 - TypeScript
-- Prisma ORM
-- SQLite
+- Prisma ORM + SQLite
 - Tailwind CSS
+- SWR
+- lucide-react
+- next-theme
 
 ---
 
@@ -65,17 +66,158 @@ Open:
 http://localhost:3000
 
 # Project Structure
-src/
-  app/
-  components/
-prisma/
-  schema.prisma
-  seed.ts
+streapost/
+├── app/
+│   ├── api/
+│   │   ├── posts/
+│   │   │   ├── route.ts           # GET /api/posts (paginated, filterable by author)
+│   │   │   └── [id]/
+│   │   │       └── route.ts       # GET, DELETE /api/posts/[id]
+│   │   └── users/
+│   │       ├── route.ts           # GET /api/users (paginated, searchable)
+│   │       └── [id]/
+│   │           └── route.ts       # GET /api/users/[id]
+│   ├── components/
+│   │   ├── common/                # Shared across domains
+│   │   │   ├── DeleteModal.tsx
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── LoadingOverlay.tsx
+│   │   │   ├── OfflineBanner.tsx
+│   │   │   ├── SWRProvider.tsx
+│   │   │   └── ThemeProvider.tsx
+│   │   ├── posts/
+│   │   │   ├── PostCard.tsx
+│   │   │   ├── PostCardMenu.tsx
+│   │   │   ├── PostsFilter.tsx
+│   │   │   ├── PostsGrid.tsx
+│   │   │   └── PostsList.tsx
+│   │   └── writers/
+│   │       └── WritersSidebar.tsx
+│   ├── hooks/
+│   │   ├── useLanguage.ts         # Global i18n via useSyncExternalStore
+│   │   ├── useOnlineStatus.ts     # navigator.onLine + browser events
+│   │   ├── usePosts.ts            # SWR infinite + debounce + optimistic delete
+│   │   ├── useTheme.ts            # Dark/light mode
+│   │   └── useWriters.ts          # SWR infinite + debounced search
+│   ├── posts/[id]/page.tsx
+│   ├── types/
+│   │   ├── index.ts               # Re-exports
+│   │   ├── post.ts                # Post, PostsResponse
+│   │   └── user.ts                # User, Writer, WritersResponse
+│   └── writers/
+│       ├── [id]/page.tsx
+│       └── page.tsx
+├── lib/
+│   ├── messages.ts                # i18n strings (en, es)
+│   ├── prisma.ts                  # Prisma client singleton
+│   └── services/
+│       ├── post.service.ts        # getPosts, getPostById, deletePost
+│       └── user.service.ts        # getUsers, getUserById
+└── prisma/
+    ├── schema.prisma
+    └── seed.ts
+
+## Architecture
+### Component organization
+Components are grouped by domain under app/components/
+- common/ — shared UI: Header, DeleteModal, EmptyState, LoadingOverlay, OfflineBanner, SWRProvider, ThemeProvider
+- posts/ — post-specific: PostsList, PostCard, PostCardMenu, PostsFilter, PostsGrid
+- writers/ — writer-specific: WritersSidebar
+
+### Type definitions
+Centralized in app/types/
+- post.ts → Post, PostsResponse
+- user.ts → User, Writer, WritersResponse
+- index.ts → public re-exports
+
+### Service layer
+Prisma queries are isolated in lib/services/:
+- post.service.ts → getPosts, getPostById, deletePost
+- user.service.ts → getUsers, getUserById
+- API routes only handle HTTP concerns (parsing, status codes, i18n errors)
+
+### Custom hooks
+Data fetching logic lives in app/hooks/:
+- usePosts(options?) — SWR infinite scroll + debounced filter + optimistic delete. Accepts optional author for fixed external filter (writer profile page)
+- useWriters() — SWR infinite scroll + debounced search
+- useLanguage() — global i18n state via useSyncExternalStore
+- useTheme() — dark/light mode
+- useOnlineStatus() — connectivity detection via navigator.onLine + browser events
+
+### Offline support
+SWRProvider wraps the app with global SWR config (revalidateOnReconnect: true). OfflineBanner shows an offline indicator and a "back online" toast on reconnection.
+
+```mermaid
+flowchart TD
+    subgraph UI["UI — Components"]
+        PostsList["PostsList"]
+        WritersPage["WritersPage"]
+        WriterPage["WriterPage"]
+    end
+
+    subgraph Hooks["Hooks"]
+        usePosts["usePosts()"]
+        useWriters["useWriters()"]
+        usePostsFixed["usePosts({ author })"]
+        useSWRProfile["useSWR — writer profile"]
+    end
+
+    subgraph Provider["SWRProvider"]
+        fetcher["global fetcher · revalidateOnReconnect · errorRetry"]
+    end
+
+    subgraph API["API Routes"]
+        r1["/api/posts"]
+        r2["/api/posts/[id]"]
+        r3["/api/users"]
+        r4["/api/users/[id]"]
+    end
+
+    subgraph Services["Services"]
+        postSvc["post.service.ts getPosts · getPostById · deletePost"]
+        userSvc["user.service.ts getUsers · getUserById"]
+    end
+
+    subgraph DB["Database"]
+        Prisma["Prisma ORM"]
+        SQLite[("SQLite")]
+    end
+
+    PostsList --> usePosts
+    WritersPage --> useWriters
+    WriterPage --> usePostsFixed
+    WriterPage --> useSWRProfile
+
+    usePosts --> Provider
+    useWriters --> Provider
+    usePostsFixed --> Provider
+    useSWRProfile --> Provider
+
+    Provider -->|HTTP fetch| r1
+    Provider -->|HTTP fetch| r2
+    Provider -->|HTTP fetch| r3
+    Provider -->|HTTP fetch| r4
+
+    r1 --> postSvc
+    r2 --> postSvc
+    r3 --> userSvc
+    r4 --> userSvc
+
+    postSvc --> Prisma
+    userSvc --> Prisma
+    Prisma --> SQLite
+```
 
 # Features
-- List posts
-- Filter posts by userId
+- Browse posts with infinite scroll
+- Filter posts by author name, username, email or ID
+- View writer profiles with their full post history
+- Search writers by name
 - Delete posts with confirmation modal
+- Offline banner when connection is lost, auto-revalidates on reconnect
+- Dark / light mode toggle
+- English and Spanish support
 - Error handling for API failures
 
 # Database
@@ -90,6 +232,8 @@ User
 - email
 - phone
 - website
+- company
+- city
 
 Post
 - id
