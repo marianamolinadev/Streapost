@@ -99,15 +99,14 @@ SWRProvider wraps the app with global SWR config (revalidateOnReconnect: true). 
 flowchart TD
     subgraph UI["UI — Components"]
         PostsList["PostsList"]
-        WritersPage["WritersPage"]
+        WritersSidebar["WritersSidebar"]
+        WritersList["WritersList"]
         WriterPage["WriterPage"]
     end
 
     subgraph Hooks["Hooks"]
-        usePosts["usePosts()"]
+        usePosts["usePosts(author?)"]
         useWriters["useWriters()"]
-        usePostsFixed["usePosts({ author })"]
-        useSWRProfile["useSWR — writer profile"]
     end
 
     subgraph Provider["SWRProvider"]
@@ -132,19 +131,17 @@ flowchart TD
     end
 
     PostsList --> usePosts
-    WritersPage --> useWriters
-    WriterPage --> usePostsFixed
-    WriterPage --> useSWRProfile
+    WritersSidebar --> useWriters
+    WritersList --> useWriters
+    WriterPage --> usePosts
 
     usePosts --> Provider
     useWriters --> Provider
-    usePostsFixed --> Provider
-    useSWRProfile --> Provider
 
-    Provider -->|HTTP fetch| r1
-    Provider -->|HTTP fetch| r2
-    Provider -->|HTTP fetch| r3
-    Provider -->|HTTP fetch| r4
+    Provider -->|fetch| r1
+    Provider -->|fetch| r2
+    Provider -->|fetch| r3
+    Provider -->|fetch| r4
 
     r1 --> postSvc
     r2 --> postSvc

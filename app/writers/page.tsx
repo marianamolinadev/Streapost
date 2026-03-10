@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/app/hooks/useLanguage';
 import { useWriters } from '@/app/hooks/useWriters';
 import type { Writer } from '@/app/types';
-import LoadingOverlay from '@/app/components/common/LoadingOverlay';
+import ListLoading from '@/app/components/common/ListLoading';
 import EmptyState from '../components/common/EmptyState';
 
 function WriterCard({ writer }: { writer: Writer }) {
@@ -35,8 +36,12 @@ function WriterCard({ writer }: { writer: Writer }) {
 
 export default function WritersPage() {
   const { t } = useLanguage();
-  const { writers, isFirstLoad, loadingMore, isValidating, search, setSearch, sentinelRef } =
+  const { writers, isFirstLoad, isMounted, loadingMore, isValidating, search, setSearch, sentinelRef } =
     useWriters();
+
+  // Show loading until mounted (server/client match) or while first load. Avoids hydration
+  // mismatch and prevents "no results" from flashing before the overlay.
+  const showLoading = !isMounted || isFirstLoad;
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -57,15 +62,29 @@ export default function WritersPage() {
         </div>
       </div>
 
-      {isFirstLoad && <LoadingOverlay />}
+      {showLoading && (
+        <ListLoading />
+      )}
 
-      {!isFirstLoad && writers.length === 0 && !isValidating && <EmptyState />}
+      {!showLoading && writers.length === 0 && !isValidating && <EmptyState />}
 
       {writers.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {writers.map((writer) => (
-            <WriterCard key={writer.id} writer={writer} />
-          ))}
+        <div className="space-y-4">
+          {isValidating && !loadingMore && (
+            <div className="flex justify-center py-4">
+              <Image
+                src="/3-dots-bounce.svg"
+                alt=""
+                width={32}
+                height={32}
+              />
+            </div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {writers.map((writer) => (
+              <WriterCard key={writer.id} writer={writer} />
+            ))}
+          </div>
         </div>
       )}
 

@@ -4,6 +4,7 @@ import Header from "@/app/components/common/Header";
 import { ThemeProvider } from "@/app/components/common/ThemeProvider";
 import { SWRProvider } from "@/app/components/common/SWRProvider";
 import { OfflineBanner } from "@/app/components/common/OfflineBanner";
+import { NavigationLoadingProvider } from "@/app/context/NavigationLoadingContext";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -30,9 +31,11 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SWRProvider>
-            <Header />
-            {children}
-            <OfflineBanner />
+            <NavigationLoadingProvider>
+              <Header />
+              {children}
+              <OfflineBanner />
+            </NavigationLoadingProvider>
           </SWRProvider>
         </ThemeProvider>
       </body>

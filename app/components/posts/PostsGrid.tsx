@@ -1,19 +1,22 @@
 import type { Post } from '@/app/types';
 import PostCard from './PostCard';
-import LoadingOverlay from '../common/LoadingOverlay';
+import ListLoading from '../common/ListLoading';
 import EmptyState from '../common/EmptyState';
+import Image from 'next/image';
 
 interface PostsGridProps {
   posts: Post[];
   loading: boolean;
+  /** Show loading indicator when filtering (not when loading more) */
+  isFilterLoading?: boolean;
   error: string | null;
   onDeleteClick: (id: number) => void;
   deletingId?: number | null;
 }
 
-export default function PostsGrid({ posts, loading, error, onDeleteClick, deletingId }: PostsGridProps) {
+export default function PostsGrid({ posts, loading, isFilterLoading, error, onDeleteClick, deletingId }: PostsGridProps) {
   if (loading) {
-    return <LoadingOverlay />;
+    return <ListLoading />;
   }
 
   if (error) {
@@ -29,6 +32,17 @@ export default function PostsGrid({ posts, loading, error, onDeleteClick, deleti
   }
 
   return (
+    <div className="space-y-4">
+      {isFilterLoading && (
+        <div className="flex justify-center py-4">
+          <Image
+            src="/3-dots-bounce.svg"
+            alt=""
+            width={32}
+            height={32}
+          />
+        </div>
+      )}
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
       {posts.map(post => (
         <PostCard
@@ -38,6 +52,7 @@ export default function PostsGrid({ posts, loading, error, onDeleteClick, deleti
           isDeleting={deletingId === post.id}
         />
       ))}
+    </div>
     </div>
   );
 }

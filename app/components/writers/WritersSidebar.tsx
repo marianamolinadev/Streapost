@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import Image from 'next/image';
 import { X, Users, Search } from 'lucide-react';
 import type { Writer } from '@/app/types';
 import { useLanguage } from '@/app/hooks/useLanguage';
@@ -40,7 +41,10 @@ export default function WritersSidebar() {
   const [open, setOpen] = useState(false);
   const isClient = useIsClient();
   const { t } = useLanguage();
-  const { writers, search, setSearch } = useWriters();
+  const { writers, search, setSearch, isValidating, loadingMore, isMounted } = useWriters();
+
+  // Only show loading after mount to avoid hydration mismatch (isValidating differs server/client).
+  const showLoading = isMounted && isValidating && !loadingMore;
 
   const list = (
     <div className="space-y-1">
@@ -70,13 +74,17 @@ export default function WritersSidebar() {
           {t.writers}
         </h2>
         {searchInput}
-        {writers.length === 0 ? (
+        {showLoading && (
+          <div className="flex justify-center py-2">
+            <Image src="/3-dots-bounce.svg" alt="" width={24} height={24} />
+          </div>
+        )}
+        {!showLoading && writers.length === 0 && (
           <p className="text-xs text-gray-500 dark:text-gray-400 py-2">
             {t.noResultsFound}
           </p>
-        ) : (
-          list
         )}
+        {writers.length > 0 && list}
       </div>
 
       {isClient &&
@@ -118,13 +126,17 @@ export default function WritersSidebar() {
                   </button>
                 </div>
                 {searchInput}
-                {writers.length === 0 ? (
+                {showLoading && (
+                  <div className="flex justify-center py-4">
+                    <Image src="/3-dots-bounce.svg" alt="" width={32} height={32} />
+                  </div>
+                )}
+                {!showLoading && writers.length === 0 && (
                   <p className="text-sm text-gray-500 dark:text-gray-400 py-4">
                     {t.noResultsFound}
                   </p>
-                ) : (
-                  list
                 )}
+                {writers.length > 0 && list}
               </div>
             </div>
           </>,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { useLanguage } from '@/app/hooks/useLanguage';
 import type { Writer, WritersResponse } from '@/app/types';
@@ -12,7 +12,7 @@ export function useWriters() {
   const [isMounted, setIsMounted] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  useLayoutEffect(() => { setIsMounted(true); }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 300);
@@ -40,8 +40,8 @@ export function useWriters() {
   const writers: Writer[] = data ? data.flatMap((p) => p.users) : [];
   const lastPage = data?.[data.length - 1];
   const hasMore = lastPage ? lastPage.nextCursor !== null : true;
-  const isFirstLoad = isMounted && isLoading && !data;
-  const loadingMore = isValidating && size > (data?.length ?? 0);
+  const isFirstLoad = isLoading && !data;
+  const loadingMore = isMounted && !!data && isValidating && size > (data?.length ?? 0);
 
   const loadMore = useCallback(() => {
     if (hasMore && !isValidating) setSize((s) => s + 1);
@@ -61,6 +61,7 @@ export function useWriters() {
   return {
     writers,
     isFirstLoad,
+    isMounted,
     loadingMore,
     isValidating,
     search,

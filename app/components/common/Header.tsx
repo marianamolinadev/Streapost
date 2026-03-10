@@ -7,13 +7,21 @@ import { useLanguage } from '@/app/hooks/useLanguage';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useNavigationLoading } from '@/app/context/NavigationLoadingContext';
 
 export default function Header() {
   const { t, lang, changeLang } = useLanguage();
   const { setTheme } = useTheme();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { setNavigating } = useNavigationLoading();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleNavClick = (href: string) => {
+    const targetPath = href === '/' ? '/' : href;
+    const currentPath = pathname?.split('?')[0] ?? '/';
+    if (targetPath !== currentPath) setNavigating(true);
+  };
 
   const isActive = (href: string) => {
     if (pathname?.startsWith('/writers/')) {
@@ -38,7 +46,7 @@ export default function Header() {
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Link href="/" onClick={() => handleNavClick('/')} className="flex items-center gap-2 shrink-0">
           <Image src="/streapost-logo.svg" alt="Streapost" width={28} height={28} />
           <span className="text-xl font-bold text-brand-500 dark:text-brand-400">
             {t.appTitle}
@@ -50,6 +58,7 @@ export default function Header() {
             <Link
               key={href}
               href={href}
+              onClick={() => handleNavClick(href)}
               className={`text-sm font-medium transition-colors ${
                 isActive(href)
                   ? 'text-brand-500 dark:text-brand-400'
@@ -129,7 +138,7 @@ export default function Header() {
                 <Link
                   key={href}
                   href={href}
-                  onClick={closeMenu}
+                  onClick={() => { handleNavClick(href); closeMenu(); }}
                   className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     isActive(href)
                       ? 'text-brand-500 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/20'

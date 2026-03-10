@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { useLanguage } from '@/app/hooks/useLanguage';
 import type { Post, PostsResponse } from '@/app/types';
@@ -22,7 +22,8 @@ export function usePosts({ author }: UsePostsOptions = {}) {
   const [successToast, setSuccessToast] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { setIsMounted(true); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useLayoutEffect(() => { setIsMounted(true); }, []);
 
   useEffect(() => {
     if (hasFixedAuthor) return;
@@ -54,8 +55,8 @@ export function usePosts({ author }: UsePostsOptions = {}) {
   const posts: Post[] = data ? data.flatMap((p) => p.posts) : [];
   const lastPage = data?.[data.length - 1];
   const hasMore = lastPage ? lastPage.nextCursor !== null : true;
-  const isFirstLoad = isMounted && isLoading && !data;
-  const loadingMore = isValidating && size > (data?.length ?? 0);
+  const isFirstLoad = isLoading && !data;
+  const loadingMore = isMounted && !!data && isValidating && size > (data?.length ?? 0);
 
   const loadMore = useCallback(() => {
     if (hasMore && !isValidating) setSize((s) => s + 1);
@@ -101,7 +102,9 @@ export function usePosts({ author }: UsePostsOptions = {}) {
   return {
     posts,
     isFirstLoad,
+    isMounted,
     loadingMore,
+    isValidating,
     error,
     filterValue,
     setFilterValue,

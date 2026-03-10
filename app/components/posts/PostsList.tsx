@@ -15,7 +15,9 @@ export default function PostsList() {
   const {
     posts,
     isFirstLoad,
+    isMounted,
     loadingMore,
+    isValidating,
     error,
     filterValue,
     setFilterValue,
@@ -27,6 +29,10 @@ export default function PostsList() {
     handleDelete,
   } = usePosts();
 
+  // Show loading until mounted (server/client match) or while first load. Avoids hydration
+  // mismatch and prevents EmptyState from flashing before the overlay.
+  const showLoading = !isMounted || isFirstLoad;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <MemoizedFilter
@@ -35,7 +41,8 @@ export default function PostsList() {
       />
       <PostsGrid
         posts={posts}
-        loading={isFirstLoad}
+        loading={showLoading}
+        isFilterLoading={isValidating && !loadingMore}
         error={error ? t.failedToFetchPosts : null}
         onDeleteClick={setPostToDelete}
         deletingId={deletingId}
