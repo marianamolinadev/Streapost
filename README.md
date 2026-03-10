@@ -114,6 +114,7 @@ Data fetching logic lives in app/hooks/:
 ### Offline support
 SWRProvider wraps the app with global SWR config (revalidateOnReconnect: true). OfflineBanner shows an offline indicator and a "back online" toast on reconnection.
 
+## Project structure
 ```mermaid
 flowchart TD
     subgraph UI["UI — Components"]
@@ -206,3 +207,12 @@ Post
 
 ## Relationship
 User (1) → (N) Post
+
+# Future Improvements
+If this were a production project, possible improvements include:
+- **Features:** Authentication/authorization, page to create and edit posts, comments on posts, image uploads (avatars, post images), full-text search, admin dashboard, data export
+- **Security:** Rate limiting on API endpoints, input validation (e.g., Zod), CORS/CSP configuration
+- **Infrastructure:** Redis caching, Docker deployment, CI/CD pipeline
+- **Quality & observability:** E2E tests (e.g., Playwright), monitoring and error tracking (Sentry), API documentation (OpenAPI/Swagger)
+- **UX:** PWA/offline support, SEO (metadata, sitemap), accessibility audit, push or email notifications
+- **i18n:** Additional languages, automatic locale detection from browser
