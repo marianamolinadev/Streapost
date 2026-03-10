@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Poppins } from "next/font/google";
 import Header from "@/app/components/common/Header";
 import { ThemeProvider } from "@/app/components/common/ThemeProvider";
@@ -32,7 +33,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SWRProvider>
             <NavigationLoadingProvider>
-              <Header />
+              <Suspense fallback={<header className="h-[72px] bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800" />}>
+                <Header />
+              </Suspense>
               {children}
               <OfflineBanner />
             </NavigationLoadingProvider>
