@@ -1,6 +1,8 @@
 # Streapost
 Streapost is a simple posts list explorer built with **Next.js**, **Prisma**, and **PostgreSQL (Supabase)**.
 
+**[Live demo](https://streapost.vercel.app/)**
+
 The application lists posts and allows filtering them by the author (`userId`). It also supports deleting posts and includes error handling for network failures.
 
 The project was built as part of a technical challenge.

@@ -6,7 +6,9 @@ import { usePosts } from '@/app/hooks/usePosts';
 import PostsFilter from './PostsFilter';
 import PostsGrid from './PostsGrid';
 import DeleteModal from '../common/DeleteModal';
+import LoadingOverlay from '../common/LoadingOverlay';
 import { SuccessToast } from '../common/SuccessToast';
+import { ErrorToast } from '../common/ErrorToast';
 
 const MemoizedFilter = memo(PostsFilter);
 
@@ -25,7 +27,9 @@ export default function PostsList() {
     postToDelete,
     setPostToDelete,
     deletingId,
+    deletingInProgress,
     successToast,
+    errorToast,
     handleDelete,
   } = usePosts();
 
@@ -56,6 +60,7 @@ export default function PostsList() {
         </p>
       )}
 
+      {deletingInProgress !== null && <LoadingOverlay />}
       {postToDelete !== null && (
         <DeleteModal
           onConfirm={() => handleDelete(postToDelete)}
@@ -63,6 +68,7 @@ export default function PostsList() {
         />
       )}
       <SuccessToast show={successToast} message={t.postDeleted} />
+      <ErrorToast show={errorToast} message={t.failedToDeletePost} />
     </div>
   );
 }

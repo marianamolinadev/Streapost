@@ -11,6 +11,7 @@ import PostsGrid from '@/app/components/posts/PostsGrid';
 import DeleteModal from '@/app/components/common/DeleteModal';
 import LoadingOverlay from '@/app/components/common/LoadingOverlay';
 import { SuccessToast } from '@/app/components/common/SuccessToast';
+import { ErrorToast } from '@/app/components/common/ErrorToast';
 
 export default function WriterPage() {
   const { lang, t } = useLanguage();
@@ -32,7 +33,9 @@ export default function WriterPage() {
     postToDelete,
     setPostToDelete,
     deletingId,
+    deletingInProgress,
     successToast,
+    errorToast,
     handleDelete,
   } = usePosts({ author: id ? String(id) : '' });
 
@@ -50,7 +53,7 @@ export default function WriterPage() {
         {backLabel}
       </Link>
 
-      {writerLoading && <LoadingOverlay />}
+      {(writerLoading || deletingInProgress !== null) && <LoadingOverlay />}
       {writerError && <p className="text-red-500 mb-4">{writerError.message}</p>}
 
       {writer && (
@@ -128,6 +131,7 @@ export default function WriterPage() {
         />
       )}
       <SuccessToast show={successToast} message={t.postDeleted} />
+      <ErrorToast show={errorToast} message={t.failedToDeletePost} />
     </main>
   );
 }

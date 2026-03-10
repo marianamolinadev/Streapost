@@ -19,7 +19,9 @@ export function usePosts({ author }: UsePostsOptions = {}) {
   const [isMounted, setIsMounted] = useState(false);
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingInProgress, setDeletingInProgress] = useState<number | null>(null);
   const [successToast, setSuccessToast] = useState(false);
+  const [errorToast, setErrorToast] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -75,6 +77,17 @@ export function usePosts({ author }: UsePostsOptions = {}) {
 
   const handleDelete = async (postId: number) => {
     setPostToDelete(null);
+    setDeletingInProgress(postId);
+
+    const res = await fetch(`/api/posts/${postId}?lang=${lang}`, { method: 'DELETE' });
+    setDeletingInProgress(null);
+
+    if (!res.ok) {
+      setErrorToast(true);
+      setTimeout(() => setErrorToast(false), 3000);
+      return;
+    }
+
     setDeletingId(postId);
 
     // Wait for exit animation before removing from DOM
@@ -89,14 +102,8 @@ export function usePosts({ author }: UsePostsOptions = {}) {
       { revalidate: false },
     );
     setDeletingId(null);
-
-    const res = await fetch(`/api/posts/${postId}?lang=${lang}`, { method: 'DELETE' });
-    if (!res.ok) {
-      mutate();
-    } else {
-      setSuccessToast(true);
-      setTimeout(() => setSuccessToast(false), 3000);
-    }
+    setSuccessToast(true);
+    setTimeout(() => setSuccessToast(false), 3000);
   };
 
   return {
@@ -112,7 +119,9 @@ export function usePosts({ author }: UsePostsOptions = {}) {
     postToDelete,
     setPostToDelete,
     deletingId,
+    deletingInProgress,
     successToast,
+    errorToast,
     handleDelete,
   };
 }
