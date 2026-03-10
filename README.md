@@ -65,6 +65,23 @@ Open:
 
 http://localhost:3000
 
+## Testing
+
+Backend tests use Vitest. They cover services and API routes with mocked dependencies.
+
+```bash
+npm test
+```
+
+Tests are located in:
+- `lib/services/__tests__/` — post.service, user.service
+- `app/api/posts/__tests__/` — GET /api/posts
+- `app/api/posts/[id]/__tests__/` — GET, DELETE /api/posts/:id
+- `app/api/users/__tests__/` — GET /api/users
+- `app/api/users/[id]/__tests__/` — GET /api/users/:id
+
+Requires Node 18+ and `npm install` to be run successfully.
+
 ## Architecture
 ### Component organization
 Components are grouped by domain under app/components/
