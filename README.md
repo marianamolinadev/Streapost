@@ -1,5 +1,5 @@
 # Streapost
-Streapost is a simple posts list explorer built with **Next.js**, **Prisma**, and **SQLite**.
+Streapost is a simple posts list explorer built with **Next.js**, **Prisma**, and **PostgreSQL (Supabase)**.
 
 The application lists posts and allows filtering them by the author (`userId`). It also supports deleting posts and includes error handling for network failures.
 
@@ -10,7 +10,7 @@ The project was built as part of a technical challenge.
 # Tech Stack
 - Next.js
 - TypeScript
-- Prisma ORM + SQLite
+- Prisma ORM + PostgreSQL (Supabase)
 - Tailwind CSS
 - SWR
 - lucide-react
@@ -28,11 +28,15 @@ npm install
 
 ## 2. Configure environment variables
 
-Create a .env file in the project root with the following:
+1. Create a [Supabase](https://supabase.com) project.
+2. Copy the connection string from **Settings → Database** (use "Transaction" pooler, port 6543).
+3. Create a `.env` file in the project root:
 
-DATABASE_URL="file:./dev.db"
+```env
+DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
+```
 
-For simplicity in this challenge, the .env file is committed to the repository.
+Or copy from `.env.example` and fill in your values.
 
 ## 3. Run database migrations
 
@@ -40,23 +44,21 @@ For simplicity in this challenge, the .env file is committed to the repository.
 npx prisma migrate dev
 ```
 
-This will create the SQLite database (dev.db) and apply the schema.
-
 ## 4. Seed the database
 
 ```bash
 npx prisma db seed
 ```
 
-The seed script fetches data from:
+The seed script fetches data from [jsonplaceholder](https://jsonplaceholder.typicode.com) and inserts it into the database.
 
-https://jsonplaceholder.typicode.com/users
+## 5. Deploy to Vercel
 
-https://jsonplaceholder.typicode.com/posts
+1. Push this branch and connect the repo at [vercel.com](https://vercel.com).
+2. Add `DATABASE_URL` in **Settings → Environment Variables** (same Supabase connection string).
+3. Deploy.
 
-and inserts it into the local SQLite database.
-
-## 5. Run the development server
+## 6. Run the development server
 ```bash
 npm run dev
 ```
@@ -112,6 +114,7 @@ Data fetching logic lives in app/hooks/:
 ### Offline support
 SWRProvider wraps the app with global SWR config (revalidateOnReconnect: true). OfflineBanner shows an offline indicator and a "back online" toast on reconnection.
 
+## Project structure
 ```mermaid
 flowchart TD
     subgraph UI["UI — Components"]
@@ -144,7 +147,7 @@ flowchart TD
 
     subgraph DB["Database"]
         Prisma["Prisma ORM"]
-        SQLite[("SQLite")]
+        Postgres[("PostgreSQL")]
     end
 
     PostsList --> usePosts
@@ -167,7 +170,7 @@ flowchart TD
 
     postSvc --> Prisma
     userSvc --> Prisma
-    Prisma --> SQLite
+    Prisma --> Postgres
 ```
 
 # Features
@@ -183,7 +186,7 @@ flowchart TD
 
 # Database
 
-The application uses SQLite for simplicity.
+The application uses PostgreSQL via Supabase.
 
 ## Tables
 User
@@ -204,3 +207,12 @@ Post
 
 ## Relationship
 User (1) → (N) Post
+
+# Future Improvements
+If this were a production project, possible improvements include:
+- **Features:** Authentication/authorization, page to create and edit posts, comments on posts, image uploads (avatars, post images), full-text search, admin dashboard, data export
+- **Security:** Rate limiting on API endpoints, input validation (e.g., Zod), CORS/CSP configuration
+- **Infrastructure:** Redis caching, Docker deployment, CI/CD pipeline
+- **Quality & observability:** E2E tests (e.g., Playwright), monitoring and error tracking (Sentry), API documentation (OpenAPI/Swagger)
+- **UX:** PWA/offline support, SEO (metadata, sitemap), accessibility audit, push or email notifications
+- **i18n:** Additional languages, automatic locale detection from browser
