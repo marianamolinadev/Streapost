@@ -22,8 +22,27 @@ The project was built as part of a technical challenge.
 
 # Getting Started
 
-## 1. Install dependencies
+## Requirements
 
+- Node.js >= 20.19
+- npm >= 10
+
+Recommended:
+
+- Node 22 LTS
+
+## 1. Install dependencies
+Ensure you are using Node.js >= 20.19.
+
+If you use nvm:
+```bash
+nvm install 22
+```
+```bash
+nvm use 22
+```
+
+Then install dependencies:
 ```bash
 npm install
 ```
@@ -40,6 +59,10 @@ For simplicity in this challenge, the .env file is committed to the repository.
 
 ```bash
 npx prisma migrate dev
+```
+
+```bash
+npx prisma generate
 ```
 
 This will create the SQLite database (dev.db) and apply the schema.
@@ -82,7 +105,7 @@ Tests are located in:
 - `app/api/users/__tests__/` — GET /api/users
 - `app/api/users/[id]/__tests__/` — GET /api/users/:id
 
-Requires Node 18+ and `npm install` to be run successfully.
+Requires Node 20.19+ and `npm install` to be run successfully.
 
 ## Architecture
 ### Component organization
