@@ -1,4 +1,5 @@
 import { getLocale, messages } from "@/lib/messages";
+import { cacheableHeaders, noStoreHeaders } from "@/lib/api-headers";
 import { getPostById, deletePost } from "@/lib/services/post.service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,20 +13,29 @@ export async function GET(
 
   const postId = parseInt(id);
   if (isNaN(postId)) {
-    return NextResponse.json({ error: messages[lang].invalidPostId }, { status: 400 });
+    return NextResponse.json(
+      { error: messages[lang].invalidPostId },
+      { status: 400, headers: noStoreHeaders }
+    );
   }
 
   try {
     const post = await getPostById(postId);
 
     if (!post) {
-      return NextResponse.json({ error: messages[lang].postNotFound }, { status: 404 });
+      return NextResponse.json(
+        { error: messages[lang].postNotFound },
+        { status: 404, headers: noStoreHeaders }
+      );
     }
 
-    return NextResponse.json(post);
+    return NextResponse.json(post, { headers: cacheableHeaders });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: messages[lang].failedToFetchPosts }, { status: 500 });
+    return NextResponse.json(
+        { error: messages[lang].failedToFetchPost },
+        { status: 500, headers: noStoreHeaders }
+      );
   }
 }
 
@@ -39,21 +49,30 @@ export async function DELETE(
 
   const postId = parseInt(id);
   if (isNaN(postId)) {
-    return NextResponse.json({ error: messages[lang].invalidPostId }, { status: 400 });
+    return NextResponse.json(
+      { error: messages[lang].invalidPostId },
+      { status: 400, headers: noStoreHeaders }
+    );
   }
 
   try {
     const existing = await getPostById(postId);
 
     if (!existing) {
-      return NextResponse.json({ error: messages[lang].postNotFound }, { status: 404 });
+      return NextResponse.json(
+        { error: messages[lang].postNotFound },
+        { status: 404, headers: noStoreHeaders }
+      );
     }
 
     await deletePost(postId);
 
-    return NextResponse.json({ message: messages[lang].postDeleted }, { status: 200 });
+    return new NextResponse(null, { status: 204, headers: noStoreHeaders });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: messages[lang].failedToDeletePost }, { status: 500 });
+    return NextResponse.json(
+      { error: messages[lang].failedToDeletePost },
+      { status: 500, headers: noStoreHeaders }
+    );
   }
 }
