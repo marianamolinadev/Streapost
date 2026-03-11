@@ -77,6 +77,13 @@ export function usePosts({ author }: UsePostsOptions = {}) {
 
   const handleDelete = async (postId: number) => {
     setPostToDelete(null);
+
+    if (!navigator.onLine) {
+      setErrorToast(true);
+      setTimeout(() => setErrorToast(false), 3000);
+      return;
+    }
+
     setDeletingInProgress(postId);
 
     const res = await fetch(`/api/posts/${postId}?lang=${lang}`, { method: 'DELETE' });
