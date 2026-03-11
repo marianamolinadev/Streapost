@@ -76,11 +76,11 @@ describe('DELETE /api/posts/[id]', () => {
     vi.mocked(deletePost).mockResolvedValue(undefined);
   });
 
-  it('deletes post and returns 200', async () => {
+  it('deletes post and returns 204', async () => {
     const req = createRequest();
     const res = await DELETE(req, { params: Promise.resolve({ id: '1' }) });
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(204);
     expect(deletePost).toHaveBeenCalledWith(1);
   });
 
