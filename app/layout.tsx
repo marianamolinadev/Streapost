@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Poppins } from "next/font/google";
 import Header from "@/app/components/common/Header";
 import { ThemeProvider } from "@/app/components/common/ThemeProvider";
 import { SWRProvider } from "@/app/components/common/SWRProvider";
 import { OfflineBanner } from "@/app/components/common/OfflineBanner";
+import { RegisterPWA } from "@/app/components/common/RegisterPWA";
 import { NavigationLoadingProvider } from "@/app/context/NavigationLoadingContext";
 import "./globals.css";
 
@@ -14,9 +15,20 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
+const BRAND_COLOR = "#ff6900";
+
 export const metadata: Metadata = {
   title: "Streapost",
-  description: "Streapost is a simple posts list explorer built with Next.js, Prisma, and SQLite.",
+  description: "Streapost is a simple posts list explorer built with Next.js, Prisma, and PostgreSQL.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Streapost",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: BRAND_COLOR,
 };
 
 export default function RootLayout({
@@ -31,6 +43,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <RegisterPWA />
           <SWRProvider>
             <NavigationLoadingProvider>
               <Suspense fallback={<header className="h-[72px] bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800" />}>

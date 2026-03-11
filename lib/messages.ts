@@ -40,6 +40,9 @@ export const messages = {
     youreOffline: "You're offline",
     backOnline: "Back online!",
     blog: "Blog",
+    offlineTitle: "You're offline",
+    offlineMessage: "No internet connection. Check your network and try again.",
+    retry: "Retry",
   },
   es: {
     appTitle: "Streapost",
@@ -82,6 +85,9 @@ export const messages = {
     youreOffline: "Sin conexión",
     backOnline: "¡Conexión restaurada!",
     blog: "Blog",
+    offlineTitle: "Estás sin conexión",
+    offlineMessage: "No hay conexión a internet. Revisa tu red y vuelve a intentar.",
+    retry: "Reintentar",
   },
 } as const
 
